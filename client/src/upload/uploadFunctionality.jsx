@@ -4,16 +4,18 @@ import Cookies from "js-cookie";
 import { useNavigate } from "react-router-dom";
 
 const FileUploader = () => {
-  const navigate = useNavigate();
-  const cookieValue = Cookies.get('jwtoken');
-  useEffect(() => {
-    if(window.location.pathname !== '/'){
-      navigate('/');
-    }
-    if (!cookieValue) {
-      navigate('/login');
-    }
-  }, [cookieValue])
+  // const navigate = useNavigate();
+  // const cookieValue = Cookies.get('jwtoken');
+  // useEffect(() => {
+  //   if(window.location.pathname !== '/'){
+  //     navigate('/');
+  //   }
+  //   if (!cookieValue) {
+  //     navigate('/login');
+  //   }
+  // }, [cookieValue])
+
+  const cookieValue = true;
 
   const [file, setFile] = useState(null);
   const [uploadedData, setUploadedData] = useState([

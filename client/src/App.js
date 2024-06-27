@@ -7,13 +7,15 @@ export default function App() {
 
     return (
         <>
-            <BrowserRouter>
+            {/* <BrowserRouter>
                 <Routes>
                     <Route path='/login' element={<Login />} />
                     <Route path='/' element={<Upload />} />
                     <Route path="*" element={<Upload />} />
                 </Routes>
-            </BrowserRouter>
+            </BrowserRouter> */}
+
+<Upload />
         </>
     )
 }
