@@ -1,18 +1,20 @@
 const fs = require('fs').promises;
 const {DocumentProcessorServiceClient} = require('@google-cloud/documentai').v1;
 const path = require('path');
-
-const CONFIGX = {
-    credentials: {
-        private_key: process.env.PRIVATE_KEY,
-        client_email: process.env.CLIENT_EMAIL,
-    },
-    apiEndpoint: process.env.API_ENDPOINT
-}
-
-
 const filePath = path.join(__dirname, '../pdfFiles', 'output.pdf');
-const client = new DocumentProcessorServiceClient(CONFIGX);
+
+
+let client;
+exports.googleApiLogin = async()=>{
+    const CONFIGX = {
+        credentials: {
+            private_key: process.env.PRIVATE_KEY,
+            client_email: process.env.CLIENT_EMAIL,
+        },
+        apiEndpoint: process.env.API_ENDPOINT
+    }
+    client = new DocumentProcessorServiceClient(CONFIGX);
+}
 
 const arr = [];
 async function quickstart() {
@@ -73,7 +75,8 @@ async function quickstart() {
             superscript: paragraph.styleInfo.superscript,
             smallcaps: paragraph.styleInfo.smallcaps,
             fontFamily: paragraph.styleInfo.fontType,
-            fontSize: paragraph.styleInfo.fontSize
+            fontSize: paragraph.styleInfo.fontSize,
+            fontWeight: paragraph.styleInfo.fontWeight
         })
 
         string += `${paragraphText}`
@@ -91,40 +94,9 @@ async function generateHTML() {
             newText = `<b>${item.text}</b>`
         } else{
             newText = `${item.text}`  
-        }
-
+        }    
         return `<span>${newText}</span>`;
     }).join('');
-
-    // return arr.map(item => {
-    //     let style = '';
-    //     let classes = '';
-    
-    //     if (item.bold) {
-    //       style += 'font-weight:bold;';
-    //     }
-    //     if (item.italic) {
-    //       style += 'font-style:italic;';
-    //     }
-    //     if (item.underlined) {
-    //       style += 'text-decoration:underline;';
-    //     }
-    //     if (item.strikeout) {
-    //       style += 'text-decoration:line-through;';
-    //     }
-    //     if (item.subscript) {
-    //       classes += ' subscript';
-    //     }
-    //     if (item.superscript) {
-    //       classes += ' superscript';
-    //     }
-    //     if (item.smallcaps) {
-    //       style += 'font-variant:small-caps;';
-    //     }
-    //     style += `font-family:${item.fontFamily};font-size:${item.fontSize}px;`;
-    
-    //     return `<span style="${style}" class="${classes.trim()}">${item.text}</span>`;
-    //   }).join('');
 }
 
 // async function ocrMain(){
