@@ -2,44 +2,55 @@ import React, { useEffect, useState } from 'react';
 import axios from 'axios';
 import Cookies from "js-cookie";
 import { useNavigate } from "react-router-dom";
+import { apiUrl } from '../constants';
+import { styles } from './style';
+
 
 const FileUploader = () => {
-  // const navigate = useNavigate();
-  // const cookieValue = Cookies.get('jwtoken');
-  // useEffect(() => {
-  //   if(window.location.pathname !== '/'){
-  //     navigate('/');
-  //   }
-  //   if (!cookieValue) {
-  //     navigate('/login');
-  //   }
-  // }, [cookieValue])
-
-  const cookieValue = true;
-
   const [file, setFile] = useState(null);
-  const [uploadedData, setUploadedData] = useState([
-    {
-      "_id": "667c29eeb5c41bef513f8058",
-      "image": "https://stagingdmt.blob.core.windows.net/dmt-trade/632672207600544-Screenshot%202024-06-26%20075753.png",
-      "text": "<p><span>Introducing </span><span><b>Brand </b></span><span><b>Name </b></span><span><b>Text </b></span><span><b>feature\n</b></span><span>Are </span><span>you </span><span>looking </span><span>for </span><span>a </span><span>powerful </span><span>tool </span><span>to </span><span>enhance </span><span>text </span><span>analysis </span><span>and </span><span>processing</span><span>? </span><span>Look </span><span>no </span><span>further</span><span>, </span><span>because </span><span>our </span><span>revolutionary </span><span>Brand </span><span>Name </span><span>Text </span><span>feature </span><span>has </span><span>got </span><span>you\n</span><span>covered</span><span>!\n</span></p>",
-      "__v": 0
-    }]);
-  const baseUrl = process.env.NODE_ENV === "production" ? "/" : "http://localhost:8080/"
+  const [uploadedData, setUploadedData] = useState([]);
+  const [isMobile, setIsMobile] = useState(window.innerWidth < 768);
+  const navigate = useNavigate();
+  const cookieValue = Cookies.get('jwtoken');
+  const [loading, setLoading] = useState({
+    isImageUploaded: false,
+    button: false,
+    data: false
+  })
 
   useEffect(() => {
-    axios.get(`${baseUrl}api/v1/data`)
+    if(window.location.pathname !== '/'){
+      navigate('/');
+    }
+    if (!cookieValue) {
+      navigate('/login');
+    }
+  }, [cookieValue, navigate])
+
+  useEffect(() => {
+    const handleResize = () => {
+      setIsMobile(window.innerWidth < 768);
+    };
+
+    window.addEventListener('resize', handleResize);
+    return () => window.removeEventListener('resize', handleResize);
+  }, []);
+
+  useEffect(() => {
+    setLoading((prev)=>({ ...prev, data: true}));
+    axios.get(`${apiUrl}api/v1/data`)
       .then((resp) => {
         setUploadedData(resp.data.data);
+        setLoading((prev)=>({ ...prev, data: false}));
       }).catch((err) => {
         console.log(err);
+        setLoading((prev)=>({ ...prev, data: false}));
       })
-  }, [file])
+  }, [loading.isImageUploaded])
 
   const handleFileChange = (event) => {
     setFile(event.target.files);
   };
-
 
   const handleUpload = async () => {
     if (!file) {
@@ -48,10 +59,11 @@ const FileUploader = () => {
     }
 
     try {
+      setLoading((prev)=>({ ...prev, button: true}));
       const formData = new FormData();
       formData.append("file", file[0]);
 
-      const { data } = await axios.post(`${baseUrl}api/v1/uploads`, formData, {
+      await axios.post(`${apiUrl}api/v1/uploads`, formData, {
         withCredentials: true,
         headers: {
           'Content-Type': 'multipart/form-data'
@@ -59,56 +71,72 @@ const FileUploader = () => {
       });
 
       alert("File upload successfully");
-      setFile(null)
+      setFile(null);
+      setLoading((prev)=>({ ...prev, isImageUploaded: !loading.isImageUploaded}));
+      setLoading((prev)=>({ ...prev, button: false}));
     } catch (error) {
+      setLoading((prev)=>({ ...prev, button: false}));
       alert('File upload failed');
     }
   };
 
-
-
   return (
     <>
-      {cookieValue ?
-        <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
-          <div style={{ borderRadius: '5px', backgroundColor: 'grey', width: '70%' }}>
-            <h4>Upload Image</h4>
-            <div style={{ width: '50%', marginBottom: '10px' }}>
+      {cookieValue ? (
+        <div style={isMobile ?  styles.containerMobile : styles.container}>
+          <div style={isMobile ? styles.uploadBoxMobile : styles.uploadBox}>
+            <h4>Click on choose file to upload an image</h4>
+            <div style={styles.inputContainer}>
               <input
                 id="file-upload"
                 type="file"
                 onChange={handleFileChange}
-                style={{ padding: '5px' }}
+                style={isMobile ? styles.fileInputMobile : styles.fileInput}
               />
             </div>
-            <div style={{ width: '50%', display: 'flex', justifyContent: 'center' }}>
-              <button onClick={handleUpload} style={{ padding: '10px 20px', backgroundColor: 'red', color: 'white', fontWeight: 'bold', cursor: 'pointer' }}>
-                Submit
+            <div style={styles.buttonContainer}>
+              <button onClick={handleUpload} style={styles.submitButton}>
+                {loading.button ? `Loading...` : `Submit`}
               </button>
             </div>
           </div>
 
-          <div style={{ width: '50%', marginBottom: '10px', marginTop: '20px', fontWeight: 'bold' }}>
-            Uploaded Image will apear here
+          
+          <div style={{borderBottom: '.4px solid #AAAAAA', width: '90%', marginBottom: '10px'}} ></div>
+
+          <div style={styles.uploadedImageContainer}>
+            <span>Uploaded Image's</span>
           </div>
 
-          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: '20px' }}>
-            {uploadedData?.map((elem, index) => {
-              return (
-                <div key={elem?._id}>
-                  <img src={elem?.image} alt="Image" style={{ maxWidth: '60%', height: '60%' }} />
-                  <div dangerouslySetInnerHTML={{ __html: elem?.text }} />
+         {
+          loading.data ?
+          <div style={styles.dataLoading}>
+            <h3>Data Loading...</h3> 
+          </div>
+          :
+          uploadedData.length ?
+          <div style={styles.imageList}>
+            {uploadedData?.map((elem, index) => (
+              <div key={elem?._id} style={styles.imageCard}>
+                <img src={elem?.image} alt="Uploaded" style={styles.image} />
+                <div style={styles.imageText} dangerouslySetInnerHTML={{ __html: elem?.text }} />
+                <div style={styles.imageText}>
+                <span><b>Bold Words:</b></span> <span dangerouslySetInnerHTML={{ __html: elem?.boldWords }} />
                 </div>
-              )
-            })}
+              </div>
+            ))}
           </div>
-
-        </div>
         :
         <></>
-      }
+         }
+          
+        </div>
+      ) : (
+        <></>
+      )}
     </>
   );
 };
+
 
 export default FileUploader;

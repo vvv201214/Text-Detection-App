@@ -1,11 +1,11 @@
 const mongoose = require("mongoose");
 const dotenv = require('dotenv');
 const path = require("path");
-const {googleApiLogin} = require('./services/ocr')
+const {googleApiLogin} = require('./src/services/ocr')
 
-dotenv.config({path: path.resolve(__dirname, '../config.env')});
+dotenv.config({path: path.resolve(__dirname, './config.env')});
 
-const app = require('./app');
+const app = require('./src/app');
 
 
 const dB = process.env.DEV_DB
@@ -17,6 +17,6 @@ mongoose.connect(dB).then(()=>{
 
 googleApiLogin().then(()=>{});
 
-const server = app.listen(PORT, ()=>{
-    console.log(`Server running at ${PORT}`)
-});
+app.listen(PORT, '0.0.0.0', () => {
+    console.log(`Server is running on port ${PORT}`);
+  });

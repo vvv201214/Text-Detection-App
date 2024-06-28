@@ -2,10 +2,10 @@ import React, { useState } from 'react';
 import axios from 'axios';
 import '../css/login.css';
 import { useNavigate } from 'react-router-dom';
+import { apiUrl } from '../constants';
 
 export default function Login(){
     const navigate = useNavigate();
-    const baseUrl = process.env.NODE_ENV === "production" ? "/" : "http://localhost:8080/"
     const [credential, setCredential] = useState({
         user_id: '',
         pin: ''
@@ -15,7 +15,7 @@ export default function Login(){
         try{
             const {user_id, pin} = credential;
 
-            const response = await axios.post(`${baseUrl}api/v1/user/login?user_id=${user_id}&pin=${pin}`, {}, {
+            const response = await axios.post(`${apiUrl}api/v1/user/login?user_id=${user_id}&pin=${pin}`, {}, {
               withCredentials: true // Include credentials (cookies)
           });
     
