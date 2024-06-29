@@ -16,8 +16,7 @@ exports.googleApiLogin = async()=>{
     client = new DocumentProcessorServiceClient(CONFIGX);
 }
 
-const arr = [];
-async function quickstart() {
+async function quickstart(arr) {
     const imageFile = await fs.readFile(filePath);
     const name = `projects/${process.env.PROJECT_ID}/locations/${process.env.LOCATION}/processors/${process.env.PROCESSOR_ID}`;
     const encodedImage = Buffer.from(imageFile).toString('base64');
@@ -81,8 +80,8 @@ async function quickstart() {
     fs.unlink(filePath);
 }
 
-async function generateHTML() {
-    await quickstart();
+async function generateHTML(arr) {
+    await quickstart(arr);
     const textArr=[];
     const boldArr=[];
     arr.forEach(item => {
@@ -100,6 +99,7 @@ async function generateHTML() {
 }
 
 exports.ocrMain = async() => {
+    const arr = [];
     const data = await generateHTML(arr);
     const htmlParagraph = `<p>${data.text}</p>`;
     return {htmlParagraph, boldParagraph: data.bold};

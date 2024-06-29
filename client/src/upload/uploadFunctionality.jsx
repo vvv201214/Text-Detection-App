@@ -73,7 +73,6 @@ const FileUploader = () => {
       });
 
       alert("File upload successfully");
-      setFile(null);
       setLoading((prev)=>({ ...prev, isImageUploaded: !loading.isImageUploaded}));
       setLoading((prev)=>({ ...prev, button: false}));
     } catch (error) {
