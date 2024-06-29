@@ -21,6 +21,9 @@ This project is a web application that detects text from images and isolates bol
 - **Backend**: NodeJS
 - **Database**: MongoDB
 
+## Hosting Platform
+This application is hosted on **Microsoft Azure virtual machine**. It utilizes Nginx as the web server and PM2 for process management.
+
 ## Libraries and Tools Used
 
 - [google-documentai](https://www.npmjs.com/package/@google-cloud/documentai) - For OCR
