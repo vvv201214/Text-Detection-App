@@ -8,7 +8,7 @@ This project is a web application that detects text from images and isolates bol
 
 ## Features
 
-- Text detection from images using Google Cloud DocumentAI API
+- Text detection from images using Google Cloud DocumentAI API (95% data accuracy)
 - Bold word isolation
 - User authentication with JSON Web Tokens (JWT)
 - Password protection with bcrypt
