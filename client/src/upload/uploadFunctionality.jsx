@@ -37,15 +37,17 @@ const FileUploader = () => {
   }, []);
 
   useEffect(() => {
-    setLoading((prev)=>({ ...prev, data: true}));
-    axios.get(`${apiUrl}api/v1/data`)
-      .then((resp) => {
-        setUploadedData(resp.data.data);
-        setLoading((prev)=>({ ...prev, data: false}));
-      }).catch((err) => {
-        console.log(err);
-        setLoading((prev)=>({ ...prev, data: false}));
-      })
+    if(cookieValue){
+      setLoading((prev)=>({ ...prev, data: true}));
+      axios.get(`${apiUrl}api/v1/data`)
+        .then((resp) => {
+          setUploadedData(resp.data.data);
+          setLoading((prev)=>({ ...prev, data: false}));
+        }).catch((err) => {
+          console.log(err);
+          setLoading((prev)=>({ ...prev, data: false}));
+        })
+    }
   }, [loading.isImageUploaded])
 
   const handleFileChange = (event) => {
